@@ -1,0 +1,10 @@
+
+syntax = "proto3";
+
+package com.korilin.pintask.protocol;
+
+message ResponseBody {
+  int32 code = 1;
+  string msg = 2;
+  bytes data = 3;
+}
