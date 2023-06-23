@@ -2,6 +2,12 @@ import java.io.File
 
 class UnSupportException(message: String) : RuntimeException(message)
 
+val SuperClass = """
+package com.korilin.pintask.protocol
+
+abstract class ProtoGenEntity
+"""
+
 sealed class ProtoSyntax
 enum class FieldType(val protoType: String, val kotlinType: String, val kotlinDefault: String) {
     Int32("int32", "Int", "0"),
@@ -101,8 +107,12 @@ class MessageStructure(val name: String) : ProtoSyntax() {
 
         package ${pck.path}
 
+        import com.korilin.pintask.protocol.ProtoGenEntity
         import kotlinx.serialization.ExperimentalSerializationApi
         import kotlinx.serialization.Serializable
+        import kotlinx.serialization.decodeFromByteArray
+        import kotlinx.serialization.decodeFromHexString
+        import kotlinx.serialization.protobuf.ProtoBuf
         import kotlinx.serialization.protobuf.ProtoNumber
         
         """.trimIndent()
@@ -111,8 +121,9 @@ class MessageStructure(val name: String) : ProtoSyntax() {
     private fun startClass(): String {
         return """
             
+            // Generated Class from proto file
             @Serializable
-            class $name {
+            class $name: ProtoGenEntity() {
             
         """.trimIndent()
     }
@@ -128,8 +139,17 @@ class MessageStructure(val name: String) : ProtoSyntax() {
 
     private fun endClass(): String {
         return """
-            }
-        """.trimIndent()
+    companion object {
+        fun fromByteArray(bytes: ByteArray): $name {
+            return ProtoBuf.decodeFromByteArray(bytes)
+        }
+
+        fun fromHexString(hex: String): $name {
+            return ProtoBuf.decodeFromHexString(hex)
+        }
+    }
+}
+        """
     }
 
     fun generateClassFile(tpd: TargetPackageDir) {
@@ -226,7 +246,21 @@ fun asProtoFiles(fileOrDir: File): List<File> {
     return files
 }
 
+fun genSuperClass() {
+    val dir = File(outputRoot, "com.korilin.pintask.protocol")
+    dir.mkdirs()
+    val file = File(dir, "ProtoGenEntity.kt")
+    file.createNewFile()
+    val writer = file.writer()
+    writer.append(SuperClass)
+    writer.close()
+}
+
+
 val files = asProtoFiles(sourceRoot)
+
+genSuperClass()
+
 files.forEach {
     println("parse $it")
     val result = parseProtoSyntax(it)
