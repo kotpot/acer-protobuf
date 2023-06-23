@@ -10,9 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
-    implementation(kotlin("stdlib-jdk8"))
 }
 
 sourceSets {
