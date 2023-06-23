@@ -1,52 +1,33 @@
-import com.google.protobuf.gradle.id
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    java
-    kotlin("jvm")
-    id("com.google.protobuf") version "0.9.3"
+    `kotlin-dsl`
+    kotlin("plugin.serialization") version "1.8.21"
 }
 
-val protocolVersion = "3.22.5"
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-    implementation("com.google.protobuf:protobuf-kotlin-lite:$protocolVersion")
-    implementation("com.google.protobuf:protobuf-javalite:$protocolVersion")
-}
-
-buildscript {
-    dependencies {
-        classpath("com.google.protobuf:protobuf-gradle-plugin:0.9.3")
-    }
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
+    implementation(kotlin("stdlib-jdk8"))
 }
 
 sourceSets {
     main {
-        proto {
-            srcDirs("proto/net")
+        kotlin {
+            srcDirs(
+                "generate"
+            )
         }
     }
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:$protocolVersion"
-    }
-
-    plugins {
-    }
-
-    generateProtoTasks {
-        ofSourceSet("main").forEach { task ->
-            task.builtins {
-                getByName("java") { // Java Scope
-                    option("lite")
-                }
-                id("kotlin") { // Kotlin Scope
-                    option("lite")
-                }
-            }
-            task.plugins {
-            }
-        }
-    }
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    languageVersion = "1.5"
+    freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    jvmTarget = "1.8"
 }
