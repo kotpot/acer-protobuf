@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
 }
 
 val compileKotlin: KotlinCompile by tasks
