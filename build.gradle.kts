@@ -13,16 +13,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.1")
 }
 
-sourceSets {
-    main {
-        kotlin {
-            srcDirs(
-                "generate"
-            )
-        }
-    }
-}
-
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
     languageVersion = "1.5"
